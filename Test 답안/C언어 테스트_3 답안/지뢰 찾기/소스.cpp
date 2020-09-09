@@ -9,7 +9,8 @@ void main()
 	minesweeper.Init();
 	minesweeper.DrawMap();
 
-	while (true)
+	bool playing = true;
+	while (playing)
 	{
 		switch (Hit())
 		{
@@ -32,7 +33,7 @@ void main()
 			minesweeper.SpaceEvent();
 			break;
 		case ESC:
-			minesweeper.Option();
+			minesweeper.Option(playing);
 			minesweeper.DrawMap();
 			break;
 		default:

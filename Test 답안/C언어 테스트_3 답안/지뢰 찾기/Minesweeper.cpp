@@ -36,18 +36,13 @@ void Minesweeper::Load()
 	{
 		system("cls");
 
-		int tmp;
-
 		while (true)
 		{
 			cout << "높이(9 ~ 24) : ";
-			tmp = InputNum();
+			height = InputNum();
 
-			if (tmp >= 9 && tmp <= 24)
-			{
-				height = tmp;
+			if (height >= 9 && height <= 24)
 				break;
-			}
 			else
 				cout << "범위를 벗어났습니다." << endl;
 		}
@@ -55,27 +50,25 @@ void Minesweeper::Load()
 		while (true)
 		{
 			cout << "너비(9 ~ 30) : ";
-			tmp = InputNum();
+			width = InputNum();
 
-			if (tmp >= 9 && tmp <= 30)
-			{
-				width = tmp;
+			if (width >= 9 && width <= 30)
 				break;
-			}
 			else
 				cout << "범위를 벗어났습니다." << endl;
 		}
 
+		int mineMax = TileCount() - 1;
+		if (mineMax > 668)
+			mineMax = 668;
+
 		while (true)
 		{
-			cout << "지뢰(10 ~ 668) : ";
-			tmp = InputNum();
+			cout << "지뢰(10 ~ " << to_string(mineMax) << ") : ";
+			mineCount = InputNum();
 
-			if (tmp >= 10 && tmp <= 668)
-			{
-				mineCount = tmp;
+			if (mineCount >= 10 && mineCount <= mineMax)
 				break;
-			}
 			else
 				cout << "범위를 벗어났습니다." << endl;
 		}
@@ -88,7 +81,22 @@ void Minesweeper::Init()
 
 	mine = new Mine[mineCount];
 	for (int i = 0; i < mineCount; i++)
-		mine[i].SetPosition({ RandNum(0, width - 1), RandNum(0, height - 1) });
+	{
+		while (true)
+		{
+			mine[i].SetPosition({ RandNum(0, width - 1), RandNum(0, height - 1) });
+
+			bool overlap = false;
+			for (int j = 0; j < i; j++)
+			{
+				if (mine[j].GetPosition() == mine[i].GetPosition())
+					overlap = true;
+			}
+
+			if (!overlap)
+				break;
+		}
+	}
 
 	tile = new Tile[TileCount()];
 	for (int i = 0; i < TileCount(); i++)
@@ -110,6 +118,7 @@ void Minesweeper::DrawMap()
 void Minesweeper::DrawMineCount()
 {
 	Draw draw;
+	draw.WidthLine(0, height, width, "  ");
 	draw.TextMiddle(width / 2, height, "지뢰 : " + to_string(mineCount - PlagTileCount()));
 }
 
@@ -290,15 +299,16 @@ void Minesweeper::SpaceEvent()
 	}
 }
 
-void Minesweeper::Option()
+void Minesweeper::Option(bool& playing)
 {
 	while (true)
 	{
 		system("cls");
 
-		cout << "1. 난이도 설정" << endl << "(현재 : " << level << ")" << endl << endl;
-		cout << "2. 물음표 On/Off" << endl << "(현재 : " << (useQuestionMark ? "On" : "Off") << ")" << endl << endl;
-		cout << "3. 돌아가기" << endl << endl;
+		cout << "1. 난이도 설정" << endl << "(현재 : " << level << ")" << endl;
+		cout << "2. 물음표 On/Off" << endl << "(현재 : " << (useQuestionMark ? "On" : "Off") << ")" << endl;
+		cout << "3. 돌아가기" << endl;
+		cout << "4. 종료" << endl;
 		cout << "입력 : " << endl;
 
 		switch (InputNum())
@@ -322,6 +332,9 @@ void Minesweeper::Option()
 
 			break;
 		case 3:
+			return;
+		case 4:
+			playing = false;
 			return;
 		default:
 			break;

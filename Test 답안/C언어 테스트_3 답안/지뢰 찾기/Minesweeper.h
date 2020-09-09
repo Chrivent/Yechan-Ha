@@ -35,7 +35,7 @@ public:
 	bool CheckPositionIsNumberTile(Position position);
 	bool CheckPositionIsInMap(Position position);
 	void SpaceEvent();
-	void Option();
+	void Option(bool& playing);
 	void SetLevel();
 	bool CheckFindAllMine();
 	int PackTileCount();
