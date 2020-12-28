@@ -2,17 +2,14 @@
 
 #include "mecro.h"
 
-class Background
+class Background : public Object
 {
 private:
 	int type;
-	bool cheer;
 
 public:
 	Background();
 
-	void PassingBackward();
-	void PassingForward();
 	void Cheering();
 	void Draw(HDC hdc);
 

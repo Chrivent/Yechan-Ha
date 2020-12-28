@@ -1,6 +1,6 @@
 #pragma once
 
-#include "background.h"
+#include "Collider.h"
 
 class Player : public Object
 {
@@ -12,7 +12,11 @@ public:
 
 	void Running();
 	void Jumping();
+	void Dying();
+	void Winning();
 	void Idle();
+	Collider GetCollider();
+	int GetType();
 	void Draw(HDC hdc);
 
 	~Player();

@@ -2,7 +2,7 @@
 
 Ring::Ring()
 {
-	transform.position = { 1280, 180 };
+	transform.position.y = 160;
 	transform.scale = { 120, 320 };
 
 	type = 0;
@@ -10,22 +10,23 @@ Ring::Ring()
 
 void Ring::Flaming()
 {
-	type = (type == 0) ? 1 : 0;
+	type += 1;
+
+	if (type == 2)
+		type = 0;
 }
 
-void Ring::FastMove()
+Collider Ring::GetCollider()
 {
-	transform.position.x -= 6;
-}
+	Collider collider;
+	collider.transform = transform;
 
-void Ring::SlowMove()
-{
-	transform.position.x -= 4;
-}
+	collider.transform.position.x += 50;
+	collider.transform.scale.width -= 100;
+	collider.transform.position.y += 290;
+	collider.transform.scale.height -= 290;
 
-void Ring::SlowestMove()
-{
-	transform.position.x -= 2;
+	return collider;
 }
 
 void Ring::Draw(HDC hdc)
@@ -34,6 +35,8 @@ void Ring::Draw(HDC hdc)
 	transform1.scale.width /= 2;
 
 	DrawBitmapTransparent(hdc, transform1, (type == 0) ? TEXT("enemy_b.bmp") : TEXT("enemy_1b.bmp"));
+
+	//GetCollider().Draw(hdc);
 }
 
 void Ring::Draw2(HDC hdc)

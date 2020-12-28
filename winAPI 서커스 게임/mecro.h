@@ -1,3 +1,6 @@
+#pragma once
+#pragma comment(lib,"msimg32.lib")
+
 #include<stdio.h>
 #include<stdbool.h>
 #include<stdlib.h>
@@ -13,8 +16,6 @@
 #include<string>
 #include<vector>
 #include<list>
-
-#pragma comment(lib,"msimg32.lib")
 
 #define BLACK RGB(0, 0, 0)
 #define RED RGB(255, 0, 0)

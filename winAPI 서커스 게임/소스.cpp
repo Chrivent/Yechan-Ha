@@ -1,10 +1,8 @@
-#include "GameFrameWork.h"
+#include "Circus.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = TEXT("Circus");
-
-GameFrameWork g_GameFrame;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow)
 {
@@ -28,51 +26,140 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 	hWnd = CreateWindow(lpszClass, lpszClass, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 
-	g_GameFrame.Init(hWnd);
-
-	while (true)
+	while (GetMessage(&Message, NULL, 0, 0))
 	{
-		if (PeekMessage(&Message, NULL, 0, 0, PM_REMOVE))
-		{
-			if (Message.message == WM_QUIT)
-				break;
-
-			TranslateMessage(&Message);
-			DispatchMessage(&Message);
-		}
-		else
-			g_GameFrame.Update();
+		TranslateMessage(&Message);
+		DispatchMessage(&Message);
 	}
-
-	g_GameFrame.Release();
-
 	return (int)Message.wParam;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
+	HDC hdc;
+
+	HDC g_MemDC;
+	HBITMAP g_hBitmap;
+	HBITMAP g_hOld;
+
+	static Circus circus;
+	static int jarFlaming;
+	static int ringFlaming;
+	static int playerRunning;
+	static int playerWinning;
+	static int crowdCheering;
+
 	switch (iMessage)
 	{
 	case WM_CREATE:
-		SetTimer(hWnd, 1, 33, NULL);
-		return 0;
-
-	case WM_TIMER:
-		switch (wParam)
-		{
-		case 1:
-			InvalidateRect(hWnd, NULL, FALSE);
-			break;
-		}
-		return 0;
-
-	case WM_PAINT:
-		g_GameFrame.Update();
+		SetClientTransform(hWnd, { { 0, 0 }, { 1280, 720 } });
 		return 0;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
-		KillTimer(hWnd, 1);
+		return 0;
+
+	case WM_PAINT:
+		if (circus.CheckColliderIsIntersect())
+			circus.Die();
+
+		if (circus.Dying())
+			circus.PlayerDying();
+		else if (circus.CheckPlayerArriveGoal())
+		{
+			circus.DeleteRing();
+			circus.MoveToGoalOrigin();
+
+			if (playerWinning == 6)
+			{
+				circus.PlayerWinning();
+				playerWinning = 0;
+			}
+			else
+				playerWinning++;
+
+			if (crowdCheering == 2)
+			{
+				circus.CrowdCheering();
+				crowdCheering = 0;
+			}
+			else
+				crowdCheering++;
+		}
+		else
+		{
+			if (GetKeyState(VK_LEFT) & 0x8000)
+			{
+				circus.MoveBackward();
+
+				if (playerRunning == 3)
+				{
+					circus.PlayerRunning();
+					playerRunning = 0;
+				}
+				else
+					playerRunning++;
+			}
+			else if (GetKeyState(VK_RIGHT) & 0x8000)
+			{
+				if (circus.CheckPlayerCanMove())
+				{
+					circus.MoveForward();
+
+					if (playerRunning == 3)
+					{
+						circus.PlayerRunning();
+						playerRunning = 0;
+					}
+					else
+						playerRunning++;
+				}
+				else
+				{
+					circus.ResetRingSpeed();
+					circus.PlayerIdle();
+				}
+			}
+			else
+			{
+				circus.ResetRingSpeed();
+				circus.PlayerIdle();
+			}
+
+			if (GetKeyState(VK_SPACE) & 0x8000)
+				circus.Jump();
+
+			if (circus.Jumping())
+				circus.PlayerJumping();
+			circus.MoveRing();
+		}
+
+		if (jarFlaming == 1)
+		{
+			circus.JarFlaming();
+			jarFlaming = 0;
+		}
+		else
+			jarFlaming++;
+
+		if (ringFlaming == 2)
+		{
+			circus.RingFlaming();
+			ringFlaming = 0;
+		}
+		else
+			ringFlaming++;
+
+		hdc = GetDC(hWnd);
+
+		g_MemDC = CreateCompatibleDC(hdc);
+		g_hBitmap = CreateCompatibleBitmap(hdc, GetClientTransform(hWnd).scale.width, GetClientTransform(hWnd).scale.height);
+		g_hOld = (HBITMAP)SelectObject(g_MemDC, g_hBitmap);
+
+		circus.Draw(g_MemDC);
+		BitBlt(hdc, 0, 0, GetClientTransform(hWnd).scale.width, GetClientTransform(hWnd).scale.height, g_MemDC, 0, 0, SRCCOPY);
+
+		ReleaseDC(hWnd, hdc);
 		return 0;
 	}
 

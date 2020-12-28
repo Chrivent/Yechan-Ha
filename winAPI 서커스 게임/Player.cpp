@@ -2,23 +2,36 @@
 
 Player::Player()
 {
-	transform.position = { 160, 550 };
-	transform.scale = { 160, 160 };
+	transform.position = { 100, 460 };
+	transform.scale = { 170, 170 };
 
 	type = 0;
 }
 
 void Player::Running()
 {
-	type++;
+	type += 1;
 
-	if (type == 3)
+	if (type >= 3)
 		type = 0;
 }
 
 void Player::Jumping()
 {
-	type = 1;
+	type = 2;
+}
+
+void Player::Dying()
+{
+	type = 3;
+}
+
+void Player::Winning()
+{
+	type += 1;
+
+	if (type == 6 || type < 4)
+		type = 4;
 }
 
 void Player::Idle()
@@ -26,14 +39,58 @@ void Player::Idle()
 	type = 0;
 }
 
+Collider Player::GetCollider()
+{
+	Collider collider;
+	collider.transform = transform;
+
+	collider.transform.position.x += 20;
+	collider.transform.scale.width -= 40;
+	collider.transform.position.y += 150;
+	collider.transform.scale.height -= 150;
+
+	return collider;
+}
+
+int Player::GetType()
+{
+	return type;
+}
+
 void Player::Draw(HDC hdc)
 {
-	if (type == 0)
-		DrawBitmapTransparent(hdc, transform, TEXT("player0.bmp"));
-	else if (type == 1)
-		DrawBitmapTransparent(hdc, transform, TEXT("player2.bmp"));
-	else if (type == 2)
-		DrawBitmapTransparent(hdc, transform, TEXT("player1.bmp"));
+	LPCWSTR sprite;
+
+	switch (type)
+	{
+	case 0:
+		sprite = TEXT("player0.bmp");
+		break;
+
+	case 1:
+		sprite = TEXT("player1.bmp");
+		break;
+
+	case 2:
+		sprite = TEXT("player2.bmp");
+		break;
+
+	case 3:
+		sprite = TEXT("die.bmp");
+		break;
+
+	case 4:
+		sprite = TEXT("win.bmp");
+		break;
+
+	case 5:
+		sprite = TEXT("win2.bmp");
+		break;
+	}
+
+	DrawBitmapTransparent(hdc, transform, sprite);
+
+	//GetCollider().Draw(hdc);
 }
 
 Player::~Player()

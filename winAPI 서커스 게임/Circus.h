@@ -3,34 +3,48 @@
 #include "Background.h"
 #include "Player.h"
 #include "Ring.h"
+#include "Jar.h"
+#include "Goal.h"
+
+#define RING_MAX 20
 
 class Circus
 {
 private:
 	Background background;
 	Player player;
+	Ring* ring[RING_MAX];
+	Jar jar[10];
+	Goal goal;
 
-	Ring* ring[2];
-
-	int runType;
-	bool movingForward;
-	bool movingBackward;
-	bool jumping;
-	int acceleration;
-	int flameType;
+	int moveSpeed;
+	int ringSpeed;
+	bool arriveGoal;
 
 public:
 	Circus();
 
-	void Draw(HDC hdc);
+	void ResetRingSpeed();
 	void MoveForward();
 	void MoveBackward();
-	void Stop();
 	void Jump();
-	void Float();
-	void Clear();
-	void CreateRing();
+	bool Jumping();
 	void MoveRing();
+	void JarFlaming();
+	void RingFlaming();
+	void PlayerRunning();
+	void PlayerJumping();
+	void PlayerDying();
+	void PlayerWinning();
+	void PlayerIdle();
+	void CrowdCheering();
+	bool CheckColliderIsIntersect();
+	void Die();
+	bool Dying();
+	bool CheckPlayerCanMove();
+	bool CheckPlayerArriveGoal();
+	void MoveToGoalOrigin();
+	void Draw(HDC hdc);
 	void DeleteRing();
 
 	~Circus();

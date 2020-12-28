@@ -2,18 +2,17 @@
 
 #include "Collider.h"
 
-class Ring : public Object
+class Jar : public Object
 {
 private:
 	int type;
 
 public:
-	Ring();
+	Jar();
 
 	void Flaming();
 	Collider GetCollider();
 	void Draw(HDC hdc);
-	void Draw2(HDC hdc);
 
-	~Ring();
+	~Jar();
 };
