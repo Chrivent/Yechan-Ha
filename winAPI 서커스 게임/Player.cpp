@@ -34,6 +34,13 @@ void Player::Winning()
 		type = 4;
 }
 
+void Player::Resurrection()
+{
+	type = 0;
+
+	transform.position.y = 460;
+}
+
 void Player::Idle()
 {
 	type = 0;
@@ -48,6 +55,18 @@ Collider Player::GetCollider()
 	collider.transform.scale.width -= 40;
 	collider.transform.position.y += 150;
 	collider.transform.scale.height -= 150;
+
+	return collider;
+}
+
+Collider Player::GetScoreCollider()
+{
+	Collider collider;
+	collider.transform = transform;
+
+	collider.transform.position.x += 60;
+	collider.transform.scale.width -= 120;
+	collider.transform.scale.height -= 120;
 
 	return collider;
 }
@@ -91,6 +110,7 @@ void Player::Draw(HDC hdc)
 	DrawBitmapTransparent(hdc, transform, sprite);
 
 	//GetCollider().Draw(hdc);
+	GetScoreCollider().Draw(hdc);
 }
 
 Player::~Player()

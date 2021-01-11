@@ -48,19 +48,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	static int playerRunning;
 	static int playerWinning;
 	static int crowdCheering;
+	static int playerDirection;
+	static bool playerJumping;
+	static int playerResurrection;
 
 	switch (iMessage)
 	{
 	case WM_CREATE:
-		SetClientTransform(hWnd, { { 0, 0 }, { 1280, 720 } });
+		SetClientTransform(hWnd, { { 0, 0 }, { 1280, 800 } });
 		return 0;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-
+		
 	case WM_PAINT:
-		if (circus.CheckColliderIsIntersect())
+		circus.PlayerGetScore();
+
+		if (GetKeyState(VK_ESCAPE) & 0x8000)
+			circus.Resurrection();
+
+		if (circus.Resurrecting())
+			circus.IncreaseTimerResurrection();
+		else if (circus.CheckColliderIsIntersect())
 			circus.Die();
 
 		if (circus.Dying())
@@ -88,9 +98,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			if (GetKeyState(VK_LEFT) & 0x8000)
+			circus.TimerCount();
+
+			if ((GetKeyState(VK_LEFT) & 0x8000) && !playerJumping)
 			{
 				circus.MoveBackward();
+				playerDirection = LEFT;
 
 				if (playerRunning == 3)
 				{
@@ -100,11 +113,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				else
 					playerRunning++;
 			}
-			else if (GetKeyState(VK_RIGHT) & 0x8000)
+			else if ((GetKeyState(VK_RIGHT) & 0x8000) && !playerJumping)
 			{
 				if (circus.CheckPlayerCanMove())
 				{
 					circus.MoveForward();
+					playerDirection = RIGHT;
 
 					if (playerRunning == 3)
 					{
@@ -124,13 +138,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			{
 				circus.ResetRingSpeed();
 				circus.PlayerIdle();
+
+				if (!playerJumping)
+					playerDirection = NULL;
 			}
 
 			if (GetKeyState(VK_SPACE) & 0x8000)
 				circus.Jump();
 
 			if (circus.Jumping())
+			{
 				circus.PlayerJumping();
+				playerJumping = true;
+
+				switch (playerDirection)
+				{
+				case LEFT:
+					circus.MoveBackward();
+					playerDirection = LEFT;
+					break;
+				case RIGHT:
+					circus.MoveForward();
+					playerDirection = RIGHT;
+					break;
+				default:
+					circus.MoveForwardLittle();
+					break;
+				}
+			}
+			else
+				playerJumping = false;
+
 			circus.MoveRing();
 		}
 

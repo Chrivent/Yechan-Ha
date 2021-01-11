@@ -146,6 +146,7 @@
     <ClCompile Include="Jar.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Ring.cpp" />
+    <ClCompile Include="ScoreRing.cpp" />
     <ClCompile Include="소스.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +158,7 @@
     <ClInclude Include="mecro.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Ring.h" />
+    <ClInclude Include="ScoreRing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

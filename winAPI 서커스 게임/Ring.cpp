@@ -24,9 +24,14 @@ Collider Ring::GetCollider()
 	collider.transform.position.x += 50;
 	collider.transform.scale.width -= 100;
 	collider.transform.position.y += 290;
-	collider.transform.scale.height -= 290;
+	collider.transform.scale.height -= 140;
 
 	return collider;
+}
+
+Collider* Ring::GetScoreCollider()
+{
+	return NULL;
 }
 
 void Ring::Draw(HDC hdc)
@@ -35,8 +40,6 @@ void Ring::Draw(HDC hdc)
 	transform1.scale.width /= 2;
 
 	DrawBitmapTransparent(hdc, transform1, (type == 0) ? TEXT("enemy_b.bmp") : TEXT("enemy_1b.bmp"));
-
-	//GetCollider().Draw(hdc);
 }
 
 void Ring::Draw2(HDC hdc)
@@ -46,6 +49,8 @@ void Ring::Draw2(HDC hdc)
 	transform2.scale.width /= 2;
 
 	DrawBitmapTransparent(hdc, transform2, (type == 0) ? TEXT("enemy_f.bmp") : TEXT("enemy_1f.bmp"));
+
+	//GetCollider().Draw(hdc);
 }
 
 Ring::~Ring()

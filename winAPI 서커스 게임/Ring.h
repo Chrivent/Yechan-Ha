@@ -4,7 +4,7 @@
 
 class Ring : public Object
 {
-private:
+protected:
 	int type;
 
 public:
@@ -12,8 +12,9 @@ public:
 
 	void Flaming();
 	Collider GetCollider();
+	virtual Collider* GetScoreCollider();
 	void Draw(HDC hdc);
-	void Draw2(HDC hdc);
+	virtual void Draw2(HDC hdc);
 
-	~Ring();
+	virtual ~Ring();
 };

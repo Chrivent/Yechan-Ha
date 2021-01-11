@@ -26,10 +26,10 @@
 #define SKYBLUE RGB(0, 255, 255)
 #define WHITE RGB(255, 255, 255)
 
-#define LEFT 0
-#define RIGHT 1
-#define UP 2
-#define DOWN 3
+#define LEFT 1
+#define RIGHT 2
+#define UP 3
+#define DOWN 4
 
 struct Position
 {

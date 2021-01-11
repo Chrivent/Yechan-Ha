@@ -14,8 +14,10 @@ public:
 	void Jumping();
 	void Dying();
 	void Winning();
+	void Resurrection();
 	void Idle();
 	Collider GetCollider();
+	Collider GetScoreCollider();
 	int GetType();
 	void Draw(HDC hdc);
 

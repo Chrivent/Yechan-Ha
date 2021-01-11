@@ -11,7 +11,7 @@ Circus::Circus()
 		tmp += RandNum(640, 1920);
 		if (tmp <= 13090)
 		{
-			ring[i] = new Ring;
+			ring[i] = RandBool(3, 1) ? new ScoreRing : new Ring;
 			ring[i]->transform.position.x = tmp;
 		}
 		else
@@ -24,6 +24,8 @@ Circus::Circus()
 	moveSpeed = 10;
 	ResetRingSpeed();
 	arriveGoal = false;
+
+	score = 0;
 }
 
 void Circus::ResetRingSpeed()
@@ -46,6 +48,27 @@ void Circus::MoveForward()
 	else
 	{
 		player.transform.MoveRight(moveSpeed);
+		ResetRingSpeed();
+	}
+}
+
+void Circus::MoveForwardLittle()
+{
+	int tmpSpeed = moveSpeed / 2;
+
+	if (background.transform.position.x >= -11800)
+	{
+		background.transform.MoveLeft(tmpSpeed);
+		for (int i = 0; i < 10; i++)
+			jar[i].transform.MoveLeft(tmpSpeed);
+		goal.transform.MoveLeft(tmpSpeed);
+
+		ResetRingSpeed();
+		ringSpeed += tmpSpeed;
+	}
+	else
+	{
+		player.transform.MoveRight(tmpSpeed);
 		ResetRingSpeed();
 	}
 }
@@ -182,8 +205,6 @@ void Circus::Die()
 
 bool Circus::Dying()
 {
-	static int jumpDistance;
-
 	if (player.GetType() == 3)
 	{
 		if (player.transform.position.y <= 720)
@@ -220,6 +241,27 @@ bool Circus::CheckPlayerArriveGoal()
 	return arriveGoal;
 }
 
+void Circus::PlayerGetScore()
+{
+	for (int i = 0; i < RING_MAX; i++)
+	{
+		if (ring[i] != NULL)
+		{
+			Collider* scoreCollider = ring[i]->GetScoreCollider();
+
+			if (scoreCollider != NULL && CheckTransformIsIntersect(player.GetScoreCollider().transform, scoreCollider->transform))
+			{
+				Transform tmp = ring[i]->transform;
+				delete ring[i];
+				ring[i] = NULL;
+				ring[i] = new Ring;
+				ring[i]->transform = tmp;
+				score++;
+			}
+		}
+	}
+}
+
 void Circus::MoveToGoalOrigin()
 {
 	Position playerPosition = player.transform.position;
@@ -230,6 +272,31 @@ void Circus::MoveToGoalOrigin()
 
 	if (playerPosition.y != goalOriginPosition.y - 150)
 		player.transform.position.y = goalOriginPosition.y - 150;
+}
+
+void Circus::Resurrection()
+{
+	player.Resurrection();
+	timerResurrection = 90;
+
+	jumpDistance = -11;
+}
+
+bool Circus::Resurrecting()
+{
+	if (timerResurrection > 0)
+		return true;
+	return false;
+}
+
+void Circus::IncreaseTimerResurrection()
+{
+	timerResurrection--;
+}
+
+void Circus::TimerCount()
+{
+	timer++;
 }
 
 void Circus::Draw(HDC hdc)
@@ -254,6 +321,21 @@ void Circus::Draw(HDC hdc)
 		if (ring[i] != NULL)
 			ring[i]->Draw2(hdc);
 	}
+
+	TCHAR time[512];
+	int tmp = timer / 30;
+	wsprintf(time, TEXT("%d : %d"), tmp / 60, tmp % 60);
+	DrawTextOut(hdc, { { 0, 720 }, { 240, 80 } }, time, WHITE);
+
+	TCHAR timeResurrection[512];
+	int tmp2 = (timerResurrection + 29) / 30;
+	wsprintf(timeResurrection, TEXT("¹«Àû: %dÃÊ"), tmp2);
+	if (tmp2 != 0)
+		DrawTextOut(hdc, { { 420, 720 }, { 240, 80 } }, timeResurrection, WHITE);
+
+	TCHAR scoreText[512];
+	wsprintf(scoreText, TEXT("Score : %d"), score);
+	DrawTextOut(hdc, { { 960, 720 }, { 240, 80 } }, scoreText, WHITE);
 }
 
 void Circus::DeleteRing()

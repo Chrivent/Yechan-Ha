@@ -3,6 +3,7 @@
 #include "Background.h"
 #include "Player.h"
 #include "Ring.h"
+#include "ScoreRing.h"
 #include "Jar.h"
 #include "Goal.h"
 
@@ -20,12 +21,17 @@ private:
 	int moveSpeed;
 	int ringSpeed;
 	bool arriveGoal;
+	int jumpDistance;
+	int timer;
+	int timerResurrection;
+	int score;
 
 public:
 	Circus();
 
 	void ResetRingSpeed();
 	void MoveForward();
+	void MoveForwardLittle();
 	void MoveBackward();
 	void Jump();
 	bool Jumping();
@@ -43,7 +49,12 @@ public:
 	bool Dying();
 	bool CheckPlayerCanMove();
 	bool CheckPlayerArriveGoal();
+	void PlayerGetScore();
 	void MoveToGoalOrigin();
+	void Resurrection();
+	bool Resurrecting();
+	void IncreaseTimerResurrection();
+	void TimerCount();
 	void Draw(HDC hdc);
 	void DeleteRing();
 
