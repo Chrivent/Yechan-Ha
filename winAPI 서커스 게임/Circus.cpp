@@ -90,6 +90,8 @@ void Circus::MoveBackward()
 		ResetRingSpeed();
 		ringSpeed -= moveSpeed;
 	}
+	else
+		ResetRingSpeed();
 }
 
 void Circus::Jump()
