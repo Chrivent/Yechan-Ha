@@ -204,6 +204,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		circus.Draw(g_MemDC);
 		BitBlt(hdc, 0, 0, GetClientTransform(hWnd).scale.width, GetClientTransform(hWnd).scale.height, g_MemDC, 0, 0, SRCCOPY);
 
+		SelectObject(g_MemDC, g_hOld);
+		DeleteObject(g_hBitmap);
+		DeleteDC(g_MemDC);
+
 		EndPaint(hWnd, &ps);
 		return 0;
 	}
