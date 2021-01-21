@@ -36,159 +36,166 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
+	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
+
 	HDC hdc;
+	PAINTSTRUCT ps;
+	SYSTEMTIME st;
 
 	HDC g_MemDC;
 	HBITMAP g_hBitmap;
 	HBITMAP g_hOld;
 
 	static Circus circus;
-	static int jarFlaming;
-	static int ringFlaming;
-	static int playerRunning;
-	static int playerWinning;
-	static int crowdCheering;
+	static bool playerRunning;
+	static bool playerWinning;
+	static bool crowdCheering;
 	static int playerDirection;
 	static bool playerJumping;
-	static int playerResurrection;
 
 	switch (iMessage)
 	{
 	case WM_CREATE:
 		SetClientTransform(hWnd, { { 0, 0 }, { 1280, 800 } });
+		SetTimer(hWnd, 1, 15, NULL);
+		SetTimer(hWnd, 2, 60, NULL);
+		SetTimer(hWnd, 3, 90, NULL);
+		SetTimer(hWnd, 4, 210, NULL);
+		SetTimer(hWnd, 5, 120, NULL);
 		return 0;
 
 	case WM_DESTROY:
+		KillTimer(hWnd, 1);
+		KillTimer(hWnd, 2);
+		KillTimer(hWnd, 3);
+		KillTimer(hWnd, 4);
+		KillTimer(hWnd, 5);
 		PostQuitMessage(0);
 		return 0;
-		
-	case WM_PAINT:
-		circus.PlayerGetScore();
 
-		if (GetKeyState(VK_ESCAPE) & 0x8000)
-			circus.Resurrection();
-
-		if (circus.Resurrecting())
-			circus.IncreaseTimerResurrection();
-		else if (circus.CheckColliderIsIntersect())
-			circus.Die();
-
-		if (circus.Dying())
-			circus.PlayerDying();
-		else if (circus.CheckPlayerArriveGoal())
+	case WM_TIMER:
+		switch (wParam)
 		{
-			circus.DeleteRing();
-			circus.MoveToGoalOrigin();
+		case 1:
+			circus.PlayerGetScore();
 
-			if (playerWinning == 6)
+			if (GetKeyState(VK_ESCAPE) & 0x8000)
+				circus.Resurrection();
+
+			if (circus.Resurrecting())
+				circus.IncreaseTimerResurrection();
+			else if (circus.CheckColliderIsIntersect())
+				circus.Die();
+
+			if (circus.Dying())
+				circus.PlayerDying();
+			else if (circus.CheckPlayerArriveGoal())
 			{
-				circus.PlayerWinning();
-				playerWinning = 0;
+				circus.DeleteRing();
+				circus.MoveToGoalOrigin();
+
+				playerWinning = true;
+				crowdCheering = true;
 			}
 			else
-				playerWinning++;
-
-			if (crowdCheering == 2)
 			{
-				circus.CrowdCheering();
-				crowdCheering = 0;
-			}
-			else
-				crowdCheering++;
-		}
-		else
-		{
-			circus.TimerCount();
+				circus.TimerCount();
 
-			if ((GetKeyState(VK_LEFT) & 0x8000) && !playerJumping)
-			{
-				circus.MoveBackward();
-				playerDirection = LEFT;
-
-				if (playerRunning == 3)
+				if ((GetKeyState(VK_LEFT) & 0x8000) && !playerJumping)
 				{
-					circus.PlayerRunning();
-					playerRunning = 0;
+					circus.MoveBackward();
+					playerDirection = LEFT;
+					playerRunning = true;
 				}
-				else
-					playerRunning++;
-			}
-			else if ((GetKeyState(VK_RIGHT) & 0x8000) && !playerJumping)
-			{
-				if (circus.CheckPlayerCanMove())
+				else if ((GetKeyState(VK_RIGHT) & 0x8000) && !playerJumping)
 				{
-					circus.MoveForward();
-					playerDirection = RIGHT;
-
-					if (playerRunning == 3)
+					if (circus.CheckPlayerCanMove())
 					{
-						circus.PlayerRunning();
-						playerRunning = 0;
+						circus.MoveForward();
+						playerDirection = RIGHT;
+						playerRunning = true;
 					}
 					else
-						playerRunning++;
+					{
+						circus.ResetRingSpeed();
+						circus.PlayerIdle();
+					}
 				}
 				else
 				{
 					circus.ResetRingSpeed();
 					circus.PlayerIdle();
+
+					if (!playerJumping)
+						playerDirection = NULL;
 				}
-			}
-			else
-			{
-				circus.ResetRingSpeed();
-				circus.PlayerIdle();
 
-				if (!playerJumping)
-					playerDirection = NULL;
-			}
+				if (GetKeyState(VK_SPACE) & 0x8000)
+					circus.Jump();
 
-			if (GetKeyState(VK_SPACE) & 0x8000)
-				circus.Jump();
-
-			if (circus.Jumping())
-			{
-				circus.PlayerJumping();
-				playerJumping = true;
-
-				switch (playerDirection)
+				if (circus.Jumping())
 				{
-				case LEFT:
-					circus.MoveBackward();
-					playerDirection = LEFT;
-					break;
-				case RIGHT:
-					circus.MoveForward();
-					playerDirection = RIGHT;
-					break;
-				default:
-					circus.MoveForwardLittle();
-					break;
+					circus.PlayerJumping();
+					playerJumping = true;
+
+					switch (playerDirection)
+					{
+					case LEFT:
+						circus.MoveBackward();
+						playerDirection = LEFT;
+						break;
+					case RIGHT:
+						circus.MoveForward();
+						playerDirection = RIGHT;
+						break;
+					default:
+						circus.MoveForwardLittle();
+						break;
+					}
 				}
+				else
+					playerJumping = false;
+
+				circus.MoveRing();
 			}
-			else
-				playerJumping = false;
 
-			circus.MoveRing();
-		}
+			InvalidateRect(hWnd, NULL, FALSE);
+			break;
 
-		if (jarFlaming == 1)
-		{
+		case 2:
 			circus.JarFlaming();
-			jarFlaming = 0;
-		}
-		else
-			jarFlaming++;
+			break;
 
-		if (ringFlaming == 2)
-		{
+		case 3:
 			circus.RingFlaming();
-			ringFlaming = 0;
-		}
-		else
-			ringFlaming++;
 
-		hdc = GetDC(hWnd);
+			if (crowdCheering)
+			{
+				circus.CrowdCheering();
+				crowdCheering = false;
+			}
+			break;
+
+		case 4:
+			if (playerWinning)
+			{
+				circus.PlayerWinning();
+				playerWinning = false;
+			}
+			break;
+
+		case 5:
+			if (playerRunning == true)
+			{
+				circus.PlayerRunning();
+				playerRunning = false;
+			}
+			break;
+		}
+		return 0;
+		
+	case WM_PAINT:
+		hdc = BeginPaint(hWnd, &ps);
 
 		g_MemDC = CreateCompatibleDC(hdc);
 		g_hBitmap = CreateCompatibleBitmap(hdc, GetClientTransform(hWnd).scale.width, GetClientTransform(hWnd).scale.height);
@@ -197,7 +204,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		circus.Draw(g_MemDC);
 		BitBlt(hdc, 0, 0, GetClientTransform(hWnd).scale.width, GetClientTransform(hWnd).scale.height, g_MemDC, 0, 0, SRCCOPY);
 
-		ReleaseDC(hWnd, hdc);
+		EndPaint(hWnd, &ps);
 		return 0;
 	}
 
