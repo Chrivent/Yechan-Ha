@@ -1,0 +1,5 @@
+sceneSetups:
+- path: Assets/External/FT_CartoonEffect_Vol02/Scene/CT02_SampleScene.unity
+  isLoaded: 1
+  isActive: 1
+  isSubScene: 0
