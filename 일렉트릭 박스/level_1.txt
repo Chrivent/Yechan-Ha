@@ -1,0 +1,18 @@
+Board
+MainPowerSupply 0 9 3
+Target 0 1 7
+ConnectingWire 3 2 3
+ConnectingWire 8 8 3
+ConnectingWire 4 9 3
+ConnectingWire 6 2 4
+ConnectingWire 6 8 4
+ConnectingWire 6 2 5
+ConnectingWire 6 8 5
+ConnectingWire 6 2 6
+ConnectingWire 1 8 6
+ConnectingWire 2 1 7
+ConnectingWire 7 2 7
+
+Inventory
+LightBulb 0 1 1
+SolarPanel 0 3 1

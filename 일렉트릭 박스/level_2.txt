@@ -1,0 +1,24 @@
+Board
+MainPowerSupply 0 9 8
+Target 0 1 7
+ConnectingWire 2 3 4
+ConnectingWire 9 4 4
+ConnectingWire 9 5 4
+ConnectingWire 9 6 4
+ConnectingWire 9 7 4
+ConnectingWire 9 8 4
+ConnectingWire 4 9 4
+ConnectingWire 2 1 7
+ConnectingWire 9 2 7
+ConnectingWire 9 3 7
+ConnectingWire 9 4 7
+ConnectingWire 4 5 7
+ConnectingWire 2 7 8
+ConnectingWire 9 8 8
+ConnectingWire 4 9 8
+
+Inventory
+LightBulb 0 1 1
+SolarPanel 0 2 1
+WaterDispenser 0 1 3
+WaterTurbine 0 1 4
